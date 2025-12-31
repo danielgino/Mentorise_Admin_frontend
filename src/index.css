@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* ===== Base layer: טוקנים + טיפוגרפיה + איפוס עדין ===== */
+@layer base {
+    :root {
+        /* Brand */
+        --primary-1: #40E0D0;
+        --primary-2: #2E86DE;
+        --primary-3: #A66CFF;
+
+        /* Neutrals */
+        --neutral-bg: #FFFFFF;
+        --neutral-surface: #F9FAFB;
+        --neutral-surface-2: #F3F4F6;
+        --border-soft: #E5E7EB;
+        --text-primary: #111827;
+        --text-secondary: #6B7280;
+
+        /* Gradients */
+        --gradient-brand: linear-gradient(45deg, #40E0D0 0%, #2E86DE 50%, #A66CFF 100%);
+        --gradient-hover: linear-gradient(90deg, rgba(64, 224, 208, 0.1) 0%, transparent 100%);
+    }
+
+    /* שים לב: לא מגדירים כאן color-scheme גלובלי – נותנים לטיילוינד לשלוט */
+    html, body {
+        @apply bg-white text-gray-900 antialiased;
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* נטרל את ה־styles הדיפולטיים של Vite */
+    body {
+        margin: 0;          /* נשאר */
+        /* הסר את אלה שהיו אצלך וגרמו לשבירה:
+           display: flex;
+           place-items: center;
+           min-width: 320px;
+           min-height: 100vh;
+        */
+    }
+
+    /* לינקים ניטרליים – בלי צבעים דיפולטיים של Vite */
+    a {
+        @apply  no-underline;
+    }
+
+    /* אל תגדיר כפתורים גלובלית – זה מתנגש עם קומפוננטות.
+       אם חייבים בסיס, תשאיר מינימלי: */
+    button {
+        @apply inline-flex items-center justify-center cursor-pointer;
+        /* אל תגדיר padding/bg/border כאן – תן לכל קומפוננטה את ה-classes שלה */
+    }
+
+
+    
+}
