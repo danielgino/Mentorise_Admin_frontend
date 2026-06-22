@@ -41,11 +41,11 @@ export function MentoOutlineButton({
             {...rest}
             disabled={disabled || loading}
             onMouseEnter={(e) => {
-                rest.onMouseEnter?.(e as any);
+                rest.onMouseEnter?.(e);
                 setHover(true);
             }}
             onMouseLeave={(e) => {
-                rest.onMouseLeave?.(e as any);
+                rest.onMouseLeave?.(e);
                 setHover(false);
             }}
             className={[

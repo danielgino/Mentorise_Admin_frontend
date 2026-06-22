@@ -6,13 +6,12 @@ import { ApplicationDrawer } from "./components/ApplicationDrawer.tsx";
 import { ApplicationTable } from "./components/ApplicationTable.tsx";
 
 import type { PageResponse } from "../../../types/PageResponse.tsx";
-import type {TutorApplicationDto} from "../../../types/TutorApplication.tsx";
+import type {TutorApplicationDto, TutorApplicationDetailDto} from "../../../types/TutorApplication.tsx";
 import {
     approveTutorApplication,
     denyTutorApplication,
     getTutorApplicationDetails,
     getTutorApplications,
-    type TutorApplicationDetailDto
 } from "../../../api/TutorApplicationApi.tsx";
 import {STATUS_OPTIONS} from "./components/UtilsApplicationTable.tsx";
 import {FilterDropdown} from "../../../assets/filters/FilterDropdown.tsx";
@@ -91,8 +90,7 @@ export default function TutorApplicationsPage() {
                 prev && prev.id === id ? { ...prev, status: "APPROVED", adminComment: note } : prev
             );
             toast.success("הבקשה אושרה");
-            // loadApplications();
-        } catch (e) {
+        } catch {
             toast.error("נכשל אישור הבקשה");
         }
     }
@@ -111,8 +109,7 @@ export default function TutorApplicationsPage() {
                 prev && prev.id === id ? { ...prev, status: "REJECTED", adminComment: note } : prev
             );
             toast.success("הבקשה נדחתה");
-            //  loadApplications();
-        } catch (e) {
+        } catch {
             toast.error("נכשל דחיית הבקשה");
         }
     }
@@ -139,9 +136,10 @@ export default function TutorApplicationsPage() {
 
             <div className="max-w-7xl mx-auto px-8 py-8">
                 <div className="mb-8">
-                    <h1 className="mb-3" style={{ fontSize: '3rem', fontWeight: '700', background: 'linear-gradient(to left, #1a1a1a, #4a4a4a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                    <h1 className="text-6xl font-bold mb-4 bg-gradient-to-l from-[#40E0D0] via-[#2E86DE] to-[#A66CFF] bg-clip-text text-transparent">
                         בקשות מתרגלים
                     </h1>
+
                     <div className="flex items-center gap-4">
                         <div className="relative flex-1 max-w-md">
                             <Search
@@ -202,7 +200,6 @@ export default function TutorApplicationsPage() {
                 </div>
             </div>
 
-            {/* Drawer */}
             <ApplicationDrawer
                 appDetails={AppDetails}
                 appDetailsLoading={appDetailsLoading}

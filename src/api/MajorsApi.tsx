@@ -7,25 +7,25 @@ import type {CreateMajorDto, MajorDto, UpdateMajorDto} from "../types/Major.tsx"
 
 export async function getMajors(): Promise<MajorDto[]> {
     try {
-        const {data} = await apiClient.get<MajorDto[]>("/majors/getAll");
+        const {data} = await apiClient.get<MajorDto[]>("/admin/majors/getAll");
         return data;
     } catch (err) {
-        const e = err as AxiosError<any>;
+        const e = err as AxiosError<{ message?: string }>;
         throw new Error(e.response?.data?.message ?? "Failed to fetch majors");
     }
 }
 
 export async function createMajor(req: CreateMajorDto): Promise<CreateMajorDto> {
-    const { data } = await apiClient.post<CreateMajorDto>("/majors/add", req);
+    const { data } = await apiClient.post<CreateMajorDto>("/admin/majors/add", req);
     return data;
 }
 
 export async function updateMajor(majorId: number, updates: UpdateMajorDto): Promise<MajorDto> {
-    const { data } = await apiClient.patch<MajorDto>(`/majors/${majorId}`, updates);
+    const { data } = await apiClient.patch<MajorDto>(`/admin/majors/${majorId}`, updates);
     return data;
 }
 
 
 export async function deleteMajor(majorId: number): Promise<void> {
-    await apiClient.delete(`/majors/delete/${majorId}`);
+    await apiClient.delete(`/admin/majors/delete/${majorId}`);
 }

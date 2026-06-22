@@ -8,6 +8,6 @@ export type MeDto = {
 };
 
 export async function meApi(): Promise<MeDto> {
-    const { data } = await apiClient.get("/users/me");
+    const { data } = await apiClient.get("/admin/users/me");
     return data;
 }

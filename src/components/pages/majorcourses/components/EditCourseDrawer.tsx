@@ -1,4 +1,5 @@
 import { X } from 'lucide-react';
+import type {CourseDto} from "../../../../types/Course.tsx";
 import { useState, useEffect } from 'react';
 import {
     type SelectOption, SEMESTER_FILTER_OPTIONS,
@@ -9,11 +10,14 @@ import {
 } from "./UtilsCourseTable.tsx";
 import {FilterDropdown} from "../../../../assets/filters/FilterDropdown.tsx";
 import axios from "axios";
+import {MentoFormInput} from "../../../../assets/inputs/MentoFormInput.tsx";
+import {MentoOutlineButton} from "../../../../assets/buttons/MentoOutlineButton.tsx";
+import {MentoPrimaryButton} from "../../../../assets/buttons/MentoPrimaryButton.tsx";
 
 interface EditCourseDrawerProps {
     isOpen: boolean;
     onClose: () => void;
-    course: any;
+    course: CourseDto | null;
     mode: "add" | "edit";
     onSubmit: (data: CourseFormData ) => Promise<void> | void; // חדש
     majorOptions: SelectOption[];
@@ -53,7 +57,7 @@ export function EditCourseDrawer({ isOpen, onClose, course,mode,onSubmit,majorOp
                 name: course.name || "",
                 majorId: course.majorId || 0,
                 year: course.year ?? "",
-                semester: course.semester ?? "",
+                semester: (course.semester ?? "") as CourseFormData["semester"],
             });
         }
 
@@ -84,7 +88,6 @@ export function EditCourseDrawer({ isOpen, onClose, course,mode,onSubmit,majorOp
 
     const handleSubmitClick = async () => {
         const v = validate(formData);
-        console.log("VALIDATION ERRORS:", v);
 
         if (Object.keys(v).length > 0) {
             setErrors(v);
@@ -96,7 +99,7 @@ export function EditCourseDrawer({ isOpen, onClose, course,mode,onSubmit,majorOp
         try {
             await onSubmit(formData);
             onClose();
-        } catch (err: any) {
+        } catch (err) {
             if (axios.isAxiosError(err)) {
                 const status = err.response?.status;
                 if (status === 409) {
@@ -112,10 +115,7 @@ export function EditCourseDrawer({ isOpen, onClose, course,mode,onSubmit,majorOp
             setSubmitting(false);
         }
     };
-    const inputBase =
-        "w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2E86DE]/30";
-    const errBorder = "border-red-300";
-    const okBorder = "border-gray-200";
+
     if (!isOpen) return null;
 
     return (
@@ -150,34 +150,31 @@ export function EditCourseDrawer({ isOpen, onClose, course,mode,onSubmit,majorOp
                     </div>
 
                     <div className="space-y-6 mt-8">
-                        <div>
-                            <label className="block text-gray-700 mb-2 text-right">
-                                קוד קורס
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.courseCode}
-                                onChange={(e) => handleChange("courseCode", e.target.value)}
-                                className={`${inputBase} ${errors.courseCode ? errBorder : okBorder}`}
-                                placeholder="לדוגמה: 9910000"
-                            />
-                            {errors.courseCode && <p className="text-red-600 text-sm">{errors.courseCode}</p>}
-                        </div>
 
-                        <div>
-                            <label className="block text-gray-700 mb-2 text-right">
-                                שם קורס
-                            </label>
-                            <input
-                                type="text"
-                                value={formData.name}
-                                onChange={(e) => handleChange("name", e.target.value)}
-                                className={`${inputBase} ${errors.name ? errBorder : okBorder}`}
-                                placeholder="לדוגמה: מבוא למדעי המחשב"
-                            />
-                            {errors.name && <p className="text-red-600 text-sm">{errors.name}</p>}
+                        <MentoFormInput
+                            name="courseCode"
+                            label="קוד קורס"
+                            value={formData.courseCode}
+                            onChange={(v) => handleChange("courseCode", v)}
+                            placeholder="לדוגמה: 9910000"
+                            required
+                            rtl
+                            error={errors.courseCode}
+                            touched={true}
+                        />
 
-                        </div>
+                        <MentoFormInput
+                            name="name"
+                            label="שם קורס"
+                            value={formData.name}
+                            onChange={(v) => handleChange("name", v)}
+                            placeholder="לדוגמה: מבוא למדעי המחשב"
+                            required
+                            rtl
+                            error={errors.name}
+                            touched={true}
+                        />
+
 
                         <div>
                             <label className="block text-gray-700 mb-2 text-right">
@@ -228,7 +225,7 @@ export function EditCourseDrawer({ isOpen, onClose, course,mode,onSubmit,majorOp
                                     value={formData.semester === "" ? "סמסטר:הכל" : SEMESTER_REVERSE_MAP[formData.semester]}
                                     options={SEMESTER_FILTER_OPTIONS}
                                     onChange={(label) =>
-                                        handleChange("semester", (SEMESTER_PARAM_MAP[label] ?? "") as any)
+                                        handleChange("semester", (SEMESTER_PARAM_MAP[label] ?? "") as CourseFormData["semester"])
                                     }
                                 />
                             </div>
@@ -239,19 +236,12 @@ export function EditCourseDrawer({ isOpen, onClose, course,mode,onSubmit,majorOp
                     </div>
 
                     <div className="flex gap-3 mt-8 pt-6 border-t border-gray-200">
-                        <button
-                            onClick={onClose}
-                            className="flex-1 px-6 py-3 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
-                        >
-                            ביטול
-                        </button>
-                        <button
-                            onClick={handleSubmitClick}
-                            className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-[#40E0D0] via-[#2E86DE] to-[#A66CFF] text-white hover:opacity-90 transition-opacity shadow-lg disabled:opacity-60"
-                            disabled={submitting}
-                        >
+                        <MentoPrimaryButton fullWidth={true} onClick={handleSubmitClick} disabled={submitting} >
                             {submitting ? "שומר…" : (mode === "edit" ? "שמירה" : "הוספה")}
-                        </button>
+                        </MentoPrimaryButton>
+                        <MentoOutlineButton shape="rounded" onClick={onClose}>
+                            ביטול
+                        </MentoOutlineButton>
                     </div>
                 </div>
             </div>

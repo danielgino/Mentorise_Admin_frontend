@@ -25,3 +25,7 @@ export const REJECTED="REJECTED"
 export const SCOPE_MAJOR="MAJOR"
 export const SCOPE_YEAR="YEAR";
 export const SCOPE_COURSE="COURSE";
+
+export const APP_TYPE_INITIAL = "INITIAL";
+export const APP_TYPE_UPDATE  = "UPDATE";
+export const HEADER_APP_TYPE  = "סוג בקשה";

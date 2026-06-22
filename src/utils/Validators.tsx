@@ -35,7 +35,7 @@ export const isValidIsraeliPhone = (phone: string): boolean => {
 };
 export const isValidPassword = (password: string): boolean => {
     if (!password) return false;
-    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=\[\]{};:'",.<>/?\\|`~]).{8,}$/;
+    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_\-+=[\]{};:'",.<>/?\\|`~]).{8,}$/;
     return regex.test(password);
 };
 export const validateConfirmPassword = (confirm: string, password: string): string | undefined => {

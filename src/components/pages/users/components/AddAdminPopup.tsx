@@ -188,8 +188,9 @@ export function AddAdminPopup({
                 const msg = data.message ?? "אחד מהפרטים (אימייל או תעודת זהות) כבר קיימים במערכת";
                 const field = data.field as "email" | "nationalId" | undefined;
                 setErrors(prev => {
-                    const { email, nationalId, ...rest } = prev;
-                    const next: ValidationErrors = { ...rest };
+                    const next: ValidationErrors = { ...prev };
+                    delete next.email;
+                    delete next.nationalId;
 
                     if (field === "email") next.email = msg;
                     else if (field === "nationalId") next.nationalId = msg;

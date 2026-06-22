@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { isAxiosError } from "axios";
+import {MentoPrimaryButton} from "../../../../assets/buttons/MentoPrimaryButton.tsx";
+import {MentoOutlineButton} from "../../../../assets/buttons/MentoOutlineButton.tsx";
 
 type Mode = "add" | "edit";
 
@@ -125,31 +127,15 @@ function AddMajorPopup({
                 </div>
 
                 <div className="px-8 pb-8 flex items-center justify-start gap-3">
-                    <button
-                        onClick={handleSave}
-                        disabled={!canSave}
-                        className="px-6 py-2.5 rounded-full text-white font-medium transition-all duration-200 hover:opacity-90 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
-                            background: "linear-gradient(90deg, #40E0D0 0%, #2E86DE 50%, #A66CFF 100%)",
-                        }}
-                    >
-                        {saving ? "שומר..." : mode === "add" ? "שמירה" : "עדכון"}
-                    </button>
-                    <button
-                        onClick={handleCancel}
-                        disabled={saving}
-                        className="px-6 py-2.5 rounded-full font-medium transition-all duration-200 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
-                            color: "#2E86DE",
-                            border: "2px solid transparent",
-                            backgroundImage:
-                                "linear-gradient(white, white), linear-gradient(90deg, #40E0D0 0%, #2E86DE 50%, #A66CFF 100%)",
-                            backgroundOrigin: "border-box",
-                            backgroundClip: "padding-box, border-box",
-                        }}
-                    >
+                  <MentoPrimaryButton className="py-0.5 " size="md" onClick={handleSave}
+                                      disabled={!canSave}>
+                      {saving ? "שומר..." : mode === "add" ? "שמירה" : "עדכון"}
+                  </MentoPrimaryButton>
+
+                    <MentoOutlineButton size="md" shape="rounded" onClick={handleCancel}
+                                         disabled={saving}>
                         ביטול
-                    </button>
+                    </MentoOutlineButton>
                 </div>
             </div>
         </div>

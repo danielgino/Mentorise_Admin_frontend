@@ -1,10 +1,10 @@
 import {motion, AnimatePresence} from 'motion/react';
 import {X, CheckCircle, AlertCircle, User as UserIcon, Mail, IdCard, Phone} from 'lucide-react';
 import {useState, useEffect} from 'react';
-import {CLOSE_TIME_POPUPS, formatDate, formatDateTime} from "../../../../utils/Constants.tsx";
+import Swal from 'sweetalert2';
+import {CLOSE_TIME_POPUPS, formatDateTime} from "../../../../utils/Constants.tsx";
 import type {ApiUserDto, User} from "../../../../types/User.tsx";
-import {updateUser, getUserById} from "../../../../api/UsersManagementApi.tsx";
-import {buildUserPatch} from "../../../../utils/buildUserPatch.tsx";
+import { getUserById} from "../../../../api/UsersManagementApi.tsx";
 import { validateField} from "../../../../utils/Validators.tsx";
 import type {AxiosError} from "axios";
 import {MentoFormInput} from "../../../../assets/inputs/MentoFormInput.tsx";
@@ -18,6 +18,8 @@ export interface EditUserPopupProps {
     onClose: () => void;
     userData: User | null;
     rtl?: boolean;
+    onSave: (args: { uiUser: User; original: ApiUserDto }) => Promise<void>;
+    onRevokeTutor?: () => Promise<void>;
 }
 
 type ValidationErrors = {
@@ -35,7 +37,8 @@ export function EditUserPopup({
                                   isOpen,
                                   onClose,
                                   userData,
-
+                                   onSave,
+                                  onRevokeTutor,
                                   rtl = true,
                               }: EditUserPopupProps) {
     const [formData, setFormData] = useState<User | null>(null);
@@ -44,10 +47,12 @@ export function EditUserPopup({
     const [saveState, setSaveState] = useState<SaveState>('idle');
     const [saveMessage, setSaveMessage] = useState('');
     const [originalApiUser, setOriginalApiUser] = useState<ApiUserDto | null>(null);
+    const [isRevoking, setIsRevoking] = useState(false);
     const isProtectedAdmin = originalApiUser?.role === "ADMIN";
+    const isTutor = originalApiUser?.role === "TUTOR";
     const isSaving = saveState === "saving";
     const isSuccess = saveState === "success";
-    const isError= saveState === "error"
+    const isError = saveState === "error";
     useEffect(() => {
         if (userData) {
             setFormData({...userData});
@@ -67,8 +72,7 @@ export function EditUserPopup({
             try {
                 const dto = await getUserById(userData.id);
                 if (active) setOriginalApiUser(dto);
-            } catch (e) {
-                console.error("Failed to load original ApiUserDto", e);
+            } catch {
                 if (active) setOriginalApiUser(null);
             }
         })();
@@ -102,7 +106,7 @@ export function EditUserPopup({
     const handleChange = (field: keyof User, value: string | boolean) => {
         if (!formData) return;
 
-        const updatedData = { ...formData, [field]: value as any };
+        const updatedData = { ...formData, [field]: value } as User;
         setFormData(updatedData);
 
         if (touched.has(field as string)) {
@@ -126,21 +130,33 @@ export function EditUserPopup({
     };
 
 
-    async function onSave(uiUser: User, originalApiUser: ApiUserDto) {
-        const patch = buildUserPatch(originalApiUser, {
-            firstName: uiUser.firstName,
-            lastName: uiUser.lastName,
-            email: uiUser.email,
-            phoneNumber: uiUser.phoneNumber,
-            role: uiUser.role,
-            isAlumni: uiUser.isAlumni,
+
+    const handleRevokeTutor = async () => {
+        const result = await Swal.fire({
+            title: 'ביטול הרשאות מתרגל',
+            text: 'האם אתה בטוח? המשתמש יהפוך לסטודנט רגיל ויוסר ממנוע החיפוש.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'כן, בטל הרשאות',
+            cancelButtonText: 'ביטול',
+            reverseButtons: true,
         });
-
-        if (Object.keys(patch).length === 0) return;
-
-        console.log("[EDIT USER] patch to send:", patch);
-        await updateUser(originalApiUser.id, patch);
-    }
+        if (!result.isConfirmed) return;
+        try {
+            setIsRevoking(true);
+            await onRevokeTutor?.();
+            setSaveState('success');
+            setSaveMessage('הרשאות המתרגל בוטלו בהצלחה');
+            setTimeout(() => { onClose(); }, CLOSE_TIME_POPUPS);
+        } catch {
+            setSaveState('error');
+            setSaveMessage('ביטול הרשאות נכשל, נסה שוב');
+        } finally {
+            setIsRevoking(false);
+        }
+    };
 
     const handleSave = async () => {
         if (!formData) return;
@@ -157,27 +173,26 @@ export function EditUserPopup({
         setSaveMessage('');
 
         try {
-            const dataToSave = {...formData};
 
             if (!originalApiUser) {
                 setSaveState('error');
                 setSaveMessage('לא נטען המשתמש המקורי מהשרת');
                 return;
             }
-            await onSave(dataToSave, originalApiUser);
+            await onSave({ uiUser: { ...formData }, original: originalApiUser });
 
             setSaveState('success');
             setSaveMessage('המשתמש עודכן בהצלחה!');
             setTimeout(() => {onClose();
             }, CLOSE_TIME_POPUPS);
         } catch (error) {
-            const err = error as AxiosError<any>;
+            const err = error as AxiosError<{ message?: string; code?: string }>;
             if (err.response?.status === 409 && err.response?.data?.code === "DuplicateField") {
                 const msg = err.response.data?.message ;
                 setErrors(prev => ({ ...prev, email: msg }));
                 setTouched(prev => new Set(prev).add("email"));
                 setSaveState("error");
-                setSaveMessage(msg);
+                setSaveMessage(msg ?? "");
                 return;
             }
             setSaveState('error');
@@ -370,13 +385,19 @@ export function EditUserPopup({
                                                 className="w-full px-4 py-2.5 border rounded-xl bg-gray-50 text-gray-500 cursor-not-allowed border-[#E5E7EB]"
                                                 title="לא ניתן לשנות תפקיד של אדמין"
                                             />
+                                        ) : isTutor ? (
+                                            <input
+                                                type="text"
+                                                value="מתרגל"
+                                                disabled
+                                                className="w-full px-4 py-2.5 border rounded-xl bg-gray-50 text-gray-500 cursor-not-allowed border-[#E5E7EB]"
+                                                title="לביטול הרשאות מתרגל, השתמש בכפתור למטה"
+                                            />
                                         ) : (
-
                                             <FilterDropdown
                                                 label="בחר תפקיד"
                                                 options={[
                                                     { label: "סטודנט", value: "סטודנט" },
-                                                    { label: "מתרגל", value: "מתרגל" },
                                                 ]}
                                                 value={formData.role}
                                                 onChange={(v) => handleChange("role", v)}
@@ -407,25 +428,42 @@ export function EditUserPopup({
                                 className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#6B7280] py-4 border-t border-[#E5E7EB] mb-6">
                                 <div>
                                     <span className="text-[#9CA3AF]">תאריך הצטרפות:</span>{' '}
-                                    <span>{formatDate(formData.createdAt)}</span>
+                                    <span>{formatDateTime(originalApiUser?.createdAt)}</span>
                                 </div>
                                 <div>
                                     <span className="text-[#9CA3AF]">עודכן לאחרונה:</span>{' '}
-                                    <span>{formatDateTime(formData.updatedAt)}</span>
+                                    <span>{formatDateTime(originalApiUser?.updatedAt)}</span>
                                 </div>
                             </div>
+
+                            {isTutor && (
+                                <div className="mt-4 mb-4 border border-[#FCA5A5] rounded-xl p-4 bg-[#FFF5F5]">
+                                    <p className="text-sm font-semibold text-[#DC2626] mb-1">אזור מסוכן</p>
+                                    <p className="text-xs text-[#9CA3AF] mb-3">
+                                        ביטול הרשאות מתרגל יגרום למשתמש לחזור לסטודנט רגיל ולהיעלם ממנוע החיפוש.
+                                    </p>
+                                    <button
+                                        type="button"
+                                        onClick={handleRevokeTutor}
+                                        disabled={isRevoking || isSaving}
+                                        className="w-full py-2 px-4 rounded-lg border border-[#EF4444] text-[#EF4444] text-sm font-medium hover:bg-[#EF4444] hover:text-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isRevoking ? 'מבטל הרשאות...' : 'ביטול הרשאות מתרגל'}
+                                    </button>
+                                </div>
+                            )}
 
                             <div
                                 className={`flex ${rtl ? 'flex-row-reverse' : 'flex-row'} items-center gap-3 justify-center`}>
                                 <MentoOutlineButton shape="rounded"
                                                     onClick={onClose}
-                                                    disabled={isSaving}>
+                                                    disabled={isSaving || isRevoking}>
                                     ביטול
                                 </MentoOutlineButton>
                                 <MentoPrimaryButton
                                     onClick={handleSave}
                                     loading={isSaving}
-                                    disabled={isSaving}>
+                                    disabled={isSaving || isRevoking}>
                                     {isSaving ? "שומר שינוים..." : "עדכן משתמש"}
                                 </MentoPrimaryButton>
                             </div>

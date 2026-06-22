@@ -1,9 +1,7 @@
-import { Search, Pencil, Trash2 } from 'lucide-react';
+import { Search, Pencil } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import type { MajorDto } from "../../../../types/Major.tsx";
 import {MajorsGridSkeleton} from "../../../../assets/skeletons/MajorsGridSkeleton.tsx";
-import Swal from "sweetalert2";
-import {deleteMajor} from "../../../../api/MajorsApi.tsx";
 import {Pagination} from "../../../../assets/pagination/Pagination.tsx";
 
 type Props = {
@@ -11,11 +9,10 @@ type Props = {
     majorsLoading?: boolean;
     majorsError?: string | null;
     onManageCourses?: (majorId: number) => void;
-    onEditMajor?: (major: MajorDto) => void;
-
+    onEditMajor: (major: MajorDto) => void;
 };
 
-export function MajorsGrid({ majors, majorsLoading, majorsError,onManageCourses,onEditMajor }: Props) {
+export function MajorsGrid({ majors, majorsLoading, majorsError, onManageCourses, onEditMajor }: Props) {
     const [currentPage, setCurrentPage] = useState(1);
     const [query, setQuery] = useState('');
     const itemsPerPage = 6;
@@ -36,44 +33,6 @@ export function MajorsGrid({ majors, majorsLoading, majorsError,onManageCourses,
         setCurrentPage(page);
     };
 
-
-
-    const handleDelete = async (id: number) => {
-        try {
-            const result = await Swal.fire({
-                title: "?האם אתה בטוח",
-                text: "המסלול וכל הקורסים שלו ימחק לצמיתות ולא יהיה ניתן לשחזרן",
-                icon: "warning",
-                showCancelButton: true,
-                confirmButtonColor: "#A66CFF",
-                cancelButtonColor: "#d33",
-                cancelButtonText: "ביטול",
-                confirmButtonText: "כן,מחק מסלול וקורסים",
-                reverseButtons: true
-
-
-            });
-
-            if (!result.isConfirmed) return;
-
-            await deleteMajor(id);
-
-            await Swal.fire({
-
-                title: "!המחיקה הושלמה",
-                text: "המסלול נמחק מהמערכת",
-                icon: "success"
-            });
-
-        } catch (error) {
-            console.error("Delete failed:", error);
-            await Swal.fire({
-                title: "!שגיאה",
-                text: "פעולת המחיקה נכשלה",
-                icon: "error"
-            });
-        }
-    };
 
     if (majorsLoading) return <MajorsGridSkeleton />;
 
@@ -134,11 +93,8 @@ export function MajorsGrid({ majors, majorsLoading, majorsError,onManageCourses,
 
                         <div className="flex items-center justify-between pt-4 border-t border-gray-100">
                             <div className="flex gap-2">
-                                <button  onClick={() => onEditMajor?.(major)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors group" title="עריכת מסלול">
+                                <button  onClick={() => onEditMajor(major)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors group" title="עריכת מסלול">
                                     <Pencil className="w-4 h-4 text-gray-400 group-hover:text-[#2E86DE]" />
-                                </button>
-                                <button onClick={()=>handleDelete(major.id)} className="p-2 rounded-lg hover:bg-gray-100 transition-colors group" title="מחיקת מסלול">
-                                    <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-500" />
                                 </button>
                             </div>
                             <button onClick={() => onManageCourses?.(major.id)} className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#40E0D0]/10 to-[#A66CFF]/10 text-[#2E86DE] hover:from-[#40E0D0]/20 hover:to-[#A66CFF]/20 transition-colors text-sm">

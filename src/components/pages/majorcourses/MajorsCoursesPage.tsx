@@ -10,7 +10,7 @@ import type { CourseDto } from "../../../types/Course.tsx";
 import { TYPING_DELAY } from "../../../utils/Constants.tsx";
 import {SEM_ALL, SEMESTER_PARAM_MAP, YEAR_ALL, YEAR_PARAM_MAP} from "./components/UtilsCourseTable.tsx";
 import PageHeader from "./components/PageHeader.tsx";
-import AddMajorPopup from "../../popups/AddMajorPopup.tsx";
+import AddMajorPopup from "./components/AddMajorPopup.tsx";
 
 
 function MajorsCoursesPage() {
@@ -113,8 +113,7 @@ function MajorsCoursesPage() {
         setIsDrawerOpen(false);
         await fetchCourses();
     };
-
-
+//////////Major functions//////////////
 
     const handleEditMajor = (major: MajorDto) => {
         setEditingMajor(major);
@@ -133,7 +132,6 @@ function MajorsCoursesPage() {
         setIsAddMajorOpen(false);
         setEditingMajor(null);
     };
-
 
     const handleManageCourses = (majorId: number) => {
         setActiveTab("courses");

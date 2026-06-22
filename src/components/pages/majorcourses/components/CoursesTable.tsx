@@ -1,4 +1,4 @@
-import {Pencil, Search, Trash2} from "lucide-react";
+import {Pencil, Search} from "lucide-react";
 import { FilterDropdown } from "../../../../assets/filters/FilterDropdown.tsx";
 import type { CourseDto } from "../../../../types/Course.tsx";
 import {Pagination} from "../../../../assets/pagination/Pagination.tsx";
@@ -43,7 +43,7 @@ export function CoursesTable(props: CoursesTableProps) {
         yearFilter, onYearFilterChange,
         semesterFilter, onSemesterFilterChange,
         currentPage, totalPages, rowsPerPage, onPageChange, onRowsPerPageChange,
-        onEditCourse,majorOptions
+        onEditCourse, majorOptions
     } = props;
 
 
@@ -121,9 +121,6 @@ export function CoursesTable(props: CoursesTableProps) {
                                                 title="עריכה"
                                             >
                                                 <Pencil className="w-4 h-4 text-gray-400 group-hover:text-[#2E86DE]" />
-                                            </button>
-                                            <button className="p-1.5 rounded-lg hover:bg-white transition-colors group" title="מחיקה">
-                                                <Trash2 className="w-4 h-4 text-gray-400 group-hover:text-red-500" />
                                             </button>
                                         </div>
                                     </td>

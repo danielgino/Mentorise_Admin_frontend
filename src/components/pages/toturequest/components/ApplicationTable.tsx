@@ -4,6 +4,8 @@ import {formatDateTime} from "../../../../utils/Constants.tsx";
 import {mapRoleToLabel} from "../../../../api/NormalizeUser.tsx";
 import {Pagination} from "../../../../assets/pagination/Pagination.tsx";
 import {
+    APP_TYPE_UPDATE,
+    HEADER_APP_TYPE,
     HEADER_FULL_NAME,
     HEADER_ID_NUMBER,
     HEADER_ROLE,
@@ -49,6 +51,7 @@ export function ApplicationTable({
                 <tr className="bg-gray-50 border-b border-gray-200">
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">{HEADER_ID_NUMBER}</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">{HEADER_FULL_NAME}</th>
+                    <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">{HEADER_APP_TYPE}</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">{HEADER_ROLE}</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">{HEADER_TRACK}</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-600">{HEADER_STATUS}</th>
@@ -71,6 +74,17 @@ export function ApplicationTable({
                         </td>
                         <td className="px-6 py-4 text-gray-900 text-sm font-medium">
                             {request.fullName}
+                        </td>
+                        <td className="px-6 py-4">
+                            {request.applicationType === APP_TYPE_UPDATE ? (
+                                <span className="bg-amber-50 text-amber-800 border border-amber-200 rounded-xl px-3 py-1 text-sm font-semibold">
+                                    עדכון תחומי תרגול
+                                </span>
+                            ) : (
+                                <span className="bg-green-50 text-green-800 border border-green-200 rounded-xl px-3 py-1 text-sm font-semibold">
+                                    בקשה ראשונית
+                                </span>
+                            )}
                         </td>
                         <td className="px-6 py-4 text-gray-900 text-sm font-medium">
                             {mapRoleToLabel(request.role)}

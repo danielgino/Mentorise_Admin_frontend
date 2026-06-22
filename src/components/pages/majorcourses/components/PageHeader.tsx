@@ -33,9 +33,13 @@ function PageHeader({ onAddCourse,onAddMajor }: PageHeaderProps) {
             </div>
 
             <div className="text-right flex-grow">
-                <h1 className="mb-3" style={{ fontSize: '3rem', fontWeight: '700', background: 'linear-gradient(to left, #1a1a1a, #4a4a4a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                {/*<h1 className="mb-3" style={{ fontSize: '3rem', fontWeight: '700', background: 'linear-gradient(to left, #1a1a1a, #4a4a4a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>*/}
+                {/*    ניהול קורסים ומסלולים*/}
+                {/*</h1>*/}
+                <h1 className="text-4xl font-bold mb-4 bg-gradient-to-l from-[#40E0D0] via-[#2E86DE] to-[#A66CFF] bg-clip-text text-transparent">
                     ניהול קורסים ומסלולים
                 </h1>
+
                 <p className="text-gray-500" style={{ fontSize: '1.125rem' }}>
                     ניהול כל הקורסים, שיוך למסלולים וסידור לפי שנה וסמסטר
                 </p>

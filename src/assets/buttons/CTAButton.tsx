@@ -26,7 +26,6 @@ export function CTAButton({ children, variant, fullWidth = false ,onClick}: CTAB
     return (
         <motion.button
             ref={buttonRef}
-            // אין onMouseMove
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={onClick}
@@ -35,12 +34,12 @@ export function CTAButton({ children, variant, fullWidth = false ,onClick}: CTAB
                 fontSize: '15px',
                 fontWeight: '600',
                 backfaceVisibility: 'hidden',
-                transform: 'translateZ(0)', // חדות טקסט
+                transform: 'translateZ(0)',
             }}
             animate={{
                 x: 0,
                 y: 0,
-                scale: isHovered ? 1.03 : 1, // התנפחות עדינה בהובר
+                scale: isHovered ? 1.03 : 1,
             }}
             transition={{
                 type: 'spring',

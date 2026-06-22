@@ -1,49 +1,61 @@
-// src/context/UserProvider.tsx
-import {createContext, type ReactNode, useContext, useEffect, useState} from "react";
-import {meApi, type MeDto} from "../api/MeApi.tsx";
+import { type ReactNode, useEffect, useState } from "react";
+import { meApi, type MeDto } from "../api/MeApi.tsx";
 import WebsiteLoader from "../assets/loaders/WebsiteLoader.tsx";
-
-type Ctx = {
-    user: MeDto | null;
-    loadingUser: boolean;
-    isAuthenticated: boolean;
-    fetchUserDetails: () => Promise<void>;
-    setUser: (u: MeDto | null) => void;
-};
-
-const UserCtx = createContext<Ctx>(null as any);
+import { UserCtx } from "./UserContext.ts";
 
 export function UserProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<MeDto | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
 
+    const logout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("fullName");
+        setUser(null);
+        setLoadingUser(false);
+    };
+
     const fetchUserDetails = async () => {
         const token = localStorage.getItem("token");
-        if (!token) { setUser(null); setLoadingUser(false); return; }
+
+        if (!token) {
+            setUser(null);
+            setLoadingUser(false);
+            return;
+        }
+
         try {
             const me = await meApi();
             setUser(me);
             localStorage.setItem("fullName", me.fullName);
         } catch {
+            localStorage.removeItem("token");
+            localStorage.removeItem("fullName");
             setUser(null);
         } finally {
             setLoadingUser(false);
         }
     };
 
-    useEffect(() => { fetchUserDetails(); }, []);
+    useEffect(() => {
+        fetchUserDetails();
+    }, []);
+
     if (loadingUser) {
-        return (
-       <>
-       <WebsiteLoader/>
-       </>
-        );
+        return <WebsiteLoader />;
     }
+
     return (
-        <UserCtx.Provider value={{ user, loadingUser, isAuthenticated: !!user, fetchUserDetails, setUser }}>
+        <UserCtx.Provider
+            value={{
+                user,
+                loadingUser,
+                isAuthenticated: !!user,
+                fetchUserDetails,
+                setUser,
+                logout,
+            }}
+        >
             {children}
         </UserCtx.Provider>
     );
 }
-
-export const useUser = () => useContext(UserCtx);

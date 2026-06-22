@@ -36,7 +36,7 @@ export function UserTableSkeleton({ rows = 10 }: TableSkeletonProps) {
         { key: "בוגר",    w: "w-24"  },
         { key: "תפקיד",      w: "w-28"  },
         { key: "שם מלא",  w: "w-48"  },
-        { key: "ת\'ז",  w: "w-40"  },
+        { key: "ת'ז",  w: "w-40"  },
     ];
 
     return (

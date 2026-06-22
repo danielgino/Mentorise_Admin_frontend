@@ -49,11 +49,11 @@ export function MentoPrimaryButton({
         <motion.button
             {...rest}
             onMouseEnter={(e) => {
-                rest.onMouseEnter?.(e as any);
+                rest.onMouseEnter?.(e);
                 setHover(true);
             }}
             onMouseLeave={(e) => {
-                rest.onMouseLeave?.(e as any);
+                rest.onMouseLeave?.(e);
                 setHover(false);
             }}
             disabled={disabled || loading}
@@ -110,7 +110,7 @@ export function MentoPrimaryButton({
         ) : (
             <>
                 {leftIcon && <IconWrapper sizePx={s.icon}>{leftIcon}</IconWrapper>}
-                {children && <span className="font-semibold">{children}</span>}
+                {children && <span className="font-medium ">{children}</span>}
                 {rightIcon && <IconWrapper sizePx={s.icon}>{rightIcon}</IconWrapper>}
             </>
         )}

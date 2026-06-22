@@ -7,8 +7,12 @@ export function formatDate(dateStr: string): string {
     });
 }
 
-export function formatDateTime(dateStr: string): string {
+export function formatDateTime(dateStr?: string | null): string {
+    if (!dateStr) return ""; // או אפשר להחזיר "—" או "לא נבדק"
+
     const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return ""; // טיפול במקרה של תאריך לא תקין
+
     return date.toLocaleString("he-IL", {
         year: "numeric",
         month: "2-digit",

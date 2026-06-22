@@ -90,7 +90,7 @@ export function MentoFormInput({
                   aria-label={show ? "הסתר סיסמה" : "הצג סיסמה"}
                   tabIndex={-1}
               >
-                  {show ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {show ? <Eye className="w-5 h-5" /> : <EyeOff  className="w-5 h-5" />}
               </button>
           ) : (
               rightIcon && <span className="p-2 text-[#6B7280]">{rightIcon}</span>
