@@ -1,3 +1,4 @@
+import axios from "axios";
 import {type FormEvent, useState} from "react";
 import { motion } from "motion/react";
 import { GradientInput } from "../../../assets/inputs/GradientInput.tsx";
@@ -37,8 +38,20 @@ export function LoginForm() {
             await fetchUserDetails();
 
             navigate("/home");
-        } catch {
-            setError("פרטי ההתחברות שגויים");
+        } catch (err: unknown) {
+            if (axios.isAxiosError(err)) {
+                const status = err.response?.status;
+                const msg    = err.response?.data?.message;
+                if (status === 429) {
+                    setError(msg ?? "בוצעו יותר מדי ניסיונות התחברות. נסה שוב בעוד 15 דקות.");
+                } else if (status === 401) {
+                    setError(msg ?? "פרטי ההתחברות שגויים");
+                } else {
+                    setError("אירעה שגיאה. נסה שוב.");
+                }
+            } else {
+                setError("פרטי ההתחברות שגויים");
+            }
         } finally {
             setIsLoading(false);
         }
@@ -122,7 +135,7 @@ export function LoginForm() {
                 </div>
 
 
-                <MentoPrimaryButton className="py-1.5" type="submit" fullWidth={true}>
+                <MentoPrimaryButton className="py-1.5" type="submit" fullWidth={true} disabled={isLoading}>
                     {isLoading ? "מתחבר..." : "התחבר"}
                 </MentoPrimaryButton>
 
